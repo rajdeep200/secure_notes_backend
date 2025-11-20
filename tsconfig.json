@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS", // or "CommonJS" if using require()
+    "moduleResolution": "Node", // or "node" for CJS
+    "lib": ["ES2022"],
+    "strict": true,
+    "esModuleInterop": true,
+    "outDir": "dist"
+  },
+  "include": ["src"]
+}
