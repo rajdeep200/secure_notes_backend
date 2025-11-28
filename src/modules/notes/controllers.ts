@@ -1,6 +1,6 @@
 import type {Request, Response} from 'express'
 import * as z from 'zod';
-import { Note } from '../models/Notes.model';
+import { Note } from './models/Notes.model';
 
 export const CreateNoteSchema = z.object({
   title: z.string().trim().min(1).max(120),

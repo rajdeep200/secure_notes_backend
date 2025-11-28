@@ -2,20 +2,16 @@ import fs from 'fs'
 import https from 'https'
 import express from 'express'
 import helmet from 'helmet'
-import strict from 'assert/strict'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
-import csurf from 'csurf'
-import { hashPassword, verifyPassword } from './auth/password'
-import { generateToken, verifyToken } from './auth/tokens'
-import { responseMw } from "./lib/respond";
+import { responseMw } from "./shared/lib/respond";
 import dotenv from 'dotenv'
-import { connectDB } from './config/db'
+import { connectDB } from './shared/config/db'
 dotenv.config()
 connectDB()
 
-import authRouter from './auth/routes'
-import notesRouter from './routers/notesRouter'
+import authRouter from './modules/auth/routes'
+import notesRouter from './modules/notes/routers'
 
 const app = express()
 const PORT = process.env.PORT || 5050

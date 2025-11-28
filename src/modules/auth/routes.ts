@@ -1,10 +1,23 @@
 import express from 'express'
 import * as zod from 'zod'
-import { User } from '../models/User.model'
-import { hashPassword, verifyPassword } from './password'
-import { generateToken } from './tokens'
+import { User } from './models/User.model'
+import { hashPassword, verifyPassword } from './lib/password'
+import { generateToken } from './lib/tokens'
 
 const router = express.Router()
+
+function setAuthCookie(res: express.Response, token: string) {
+    res.cookie(
+        'access_token',
+        token,
+        {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'lax',
+            maxAge: 10*60*1000
+        }
+    )
+}
 
 const LoginSchema = zod.union([
     zod.object({
@@ -29,9 +42,7 @@ router.post('/login', async (req, res) => {
 
         let parsedUserObj = LoginSchema.parse(req.body)
         const query = buildQuery(parsedUserObj)
-        console.log('query =>', query)
         const savedUser = await User.findOne(query)
-        console.log('savedUser =>', savedUser)
         if (!savedUser) {
             return res.badRequest('User not found')
         }
@@ -40,6 +51,7 @@ router.post('/login', async (req, res) => {
             return res.unauthorized()
         }
         const token = generateToken(savedUser._id)
+        setAuthCookie(res, token)
         if (isValidPassword) {
             return res.ok('Logged In', { id: savedUser._id, email: savedUser.email, username: savedUser.username }, { token })
         } else {
@@ -52,9 +64,9 @@ router.post('/login', async (req, res) => {
 })
 
 const RegistrationSchema = zod.object({
-    username: zod.string(),
+    username: zod.string().trim().min(3).max(32).regex(/^[a-zA-Z0-9_.-]+$/),
     email: zod.email(),
-    password: zod.string()
+    password: zod.string().min(8)
 })
 router.post('/register', async (req, res) => {
     const { username, email, password } = req.body
@@ -63,6 +75,7 @@ router.post('/register', async (req, res) => {
         const hashedPassword = await hashPassword(password)
         const savedUser = await User.create({ ...userObj, password: hashedPassword })
         const token = generateToken(savedUser._id)
+        setAuthCookie(res, token)
         return res.created('User created', null, { token })
     } catch (error) {
         console.log('Something went wrong :: ', error)

@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express'
-import { verifyToken } from '../auth/tokens'
+import { verifyToken } from '../../modules/auth/lib/tokens'
 
 declare global {
     namespace Express {

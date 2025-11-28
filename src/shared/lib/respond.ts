@@ -24,7 +24,7 @@ export function responseMw(){
             return this.status(status).json({ok: false, msg, ...extra})
         }
         res.unauthorized = function (msg='Unauthorized', extra={}) {
-            return this.status(201).json({ok: false, msg, ...extra})
+            return this.status(401).json({ok: false, msg, ...extra})
         }
         res.badRequest = function (msg='Bad Request', extra={}) {
             return this.status(400).json({ok: false, msg, ...extra})
